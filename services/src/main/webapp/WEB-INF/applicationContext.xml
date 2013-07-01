@@ -1,0 +1,42 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:p="http://www.springframework.org/schema/p"
+       xmlns:amq="http://activemq.apache.org/schema/core"
+       xmlns:jms="http://www.springframework.org/schema/jms"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+http://activemq.apache.org/schema/core http://activemq.apache.org/schema/core/activemq-core-5.2.0.xsd
+http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd
+http://www.springframework.org/schema/jms http://www.springframework.org/schema/jms/spring-jms-2.5.xsd">
+    
+    <context:annotation-config/>
+    <context:component-scan base-package="com.pushnotification.service"/>
+
+    <bean id="pushService" class="com.pushnotification.service.rest.PushService" p:pushNotificationSender-ref="pushNotificationSender"/>
+
+    <bean id="broker" class="org.apache.activemq.broker.BrokerService" init-method="start" destroy-method="stop">
+        <property name="persistent" value="true"/>
+        <property name="transportConnectorURIs">
+            <list>
+                <value>vm://localhost:5000</value>
+            </list>
+        </property>
+    </bean>
+
+    <amq:connectionFactory id="amqConnectionFactory" brokerURL="vm://localhost:5000"/>
+    <bean id="connectionFactory" class="org.springframework.jms.connection.CachingConnectionFactory">
+        <constructor-arg ref="amqConnectionFactory"/>
+        <property name="exceptionListener" ref="jmsExceptionListener"/>
+        <property name="sessionCacheSize" value="100"/>
+    </bean>
+
+    <bean id="jmsTemplate" class="org.springframework.jms.core.JmsTemplate">
+        <constructor-arg ref="connectionFactory"/>
+        <property name="timeToLive" value="1800000"/>
+        <property name="explicitQosEnabled" value="true"/>
+    </bean>
+
+    <jms:listener-container concurrency="10">
+        <jms:listener id="NotificationListener" destination="Queue.PushNotification" ref="pushNotificationListener"/>
+    </jms:listener-container>
+</beans>

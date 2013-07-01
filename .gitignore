@@ -4,3 +4,10 @@
 *.jar
 *.war
 *.ear
+
+.idea/**/*
+.idea/*
+
+**/target/**/*
+services/*.log
+services/activemq-data/**/*
