@@ -25,5 +25,11 @@ public class PushNotificationSender {
         jmsTemplate.convertAndSend("Queue.PushNotification", notificationMessage);
         log.info(notificationMessage.toString());
     }
+
+    public void sendStatusNotification(String deviceType, String message, List<String> regIds) {
+        NotificationMessage notificationMessage = new NotificationMessage(deviceType, message, regIds);
+        jmsTemplate.convertAndSend("Queue.PushNotification", notificationMessage);
+        log.info(notificationMessage.toString());
+    }
 }
 

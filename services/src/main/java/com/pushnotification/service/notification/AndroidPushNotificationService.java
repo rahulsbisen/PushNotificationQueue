@@ -1,6 +1,7 @@
 package com.pushnotification.service.notification;
 
 import com.google.android.gcm.server.Message;
+import com.google.android.gcm.server.MulticastResult;
 import com.google.android.gcm.server.Result;
 import com.google.android.gcm.server.Sender;
 import com.pushnotification.service.model.NotificationMessage;
@@ -11,6 +12,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Properties;
 
 public class AndroidPushNotificationService extends PushNotificationService {
@@ -26,9 +28,14 @@ public class AndroidPushNotificationService extends PushNotificationService {
     public void pushNotification(NotificationMessage notificationMessage) throws CommunicationException, KeystoreException, InvalidDeviceTokenFormatException, IOException {
         Sender sender = new Sender(getGoogleCloudMessagingAPIKey());
         Message m = new Message.Builder()
-                .addData("notification.key", notificationMessage.message)
-                .addData("request.id", Integer.toString(notificationMessage.targetId))
+                .addData("data",notificationMessage.message)
                 .build();
+        if(notificationMessage.regIds!=null){
+            MulticastResult send = sender.send(m, notificationMessage.regIds, 5);
+            log.info(send.toString());
+            log.info(notificationMessage.message);
+            return;
+        }
         Result send = sender.send(m, notificationMessage.deviceToken, 5);
         log.info(send.toString());
     }

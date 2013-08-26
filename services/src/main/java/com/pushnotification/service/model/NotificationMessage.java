@@ -1,6 +1,7 @@
 package com.pushnotification.service.model;
 
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * Created with IntelliJ IDEA.
@@ -14,7 +15,7 @@ public class NotificationMessage implements Serializable {
     public String deviceType;
     public String message;
     public int targetId;
-
+    public List<String> regIds;
     public NotificationMessage() {
     }
 
@@ -24,5 +25,13 @@ public class NotificationMessage implements Serializable {
         this.deviceType = deviceType;
         this.message = message;
         this.targetId = targetId;
+    }
+
+    public NotificationMessage(String deviceType, String message, List<String> regIds) {
+
+        this.deviceToken = deviceToken;
+        this.deviceType = deviceType;
+        this.message = message;
+        this.regIds = regIds;
     }
 }
